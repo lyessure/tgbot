@@ -3,6 +3,7 @@ let currentChatId = null;
 let chats = new Map();
 let previewModal;
 let pendingImageData = null;
+let heartbeatInterval;  // 添加心跳间隔变量
 
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -10,10 +11,18 @@ function connectWebSocket() {
     
     ws.onopen = () => {
         console.log('WebSocket connected');
-        // 连接成功后清空消息列表，等待历史消息
-        const messageList = document.getElementById('messageList');
-        if (messageList) {
-            messageList.innerHTML = '';
+        // 连接成功后，如果当前有选中的聊天，重新显示其消息
+        if (currentChatId) {
+            const chat = chats.get(currentChatId);
+            if (chat) {
+                const messageList = document.getElementById('messageList');
+                if (messageList) {
+                    messageList.innerHTML = '';
+                    chat.messages.forEach(msg => {
+                        renderMessage(msg);
+                    });
+                }
+            }
         }
     };
     
@@ -36,6 +45,24 @@ function connectWebSocket() {
     ws.onerror = (error) => {
         console.error('WebSocket error:', error);
     };
+}
+
+// 启动心跳
+function startHeartbeat() {
+    // 每30秒发送一次心跳
+    heartbeatInterval = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+        }
+    }, 30000);
+}
+
+// 停止心跳
+function stopHeartbeat() {
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+    }
 }
 
 function handleMessage(message) {
