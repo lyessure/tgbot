@@ -4,6 +4,7 @@ import (
 	"bot/api"
 	"bot/web"
 	"fmt"
+	"log"
 	"os"
 	"runtime/debug"
 	"strconv"
@@ -56,7 +57,7 @@ func deliverIncomingMsg(msg api.SimpleMsg) {
 
 	msgid := api.ForwardMsg(owner, msg.ChatId, msg.MessageID)
 	if msgid == 0 {
-		return
+		log.Println("ForwardMsg failed but skip")
 	}
 
 	msgMutex.Lock()
