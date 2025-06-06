@@ -44,3 +44,9 @@ services:
       - BOT_OWNER=在userinfobot获得的id。可不设本项。
     ports:
       - "8010:8010"
+```
+
+## 已知问题
+1. 暂不支持tgs的sticker。
+2. 暂不支持gif。
+
