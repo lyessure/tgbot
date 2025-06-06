@@ -10,6 +10,11 @@ function connectWebSocket() {
     
     ws.onopen = () => {
         console.log('WebSocket connected');
+        // 连接成功后清空消息列表，等待历史消息
+        const messageList = document.getElementById('messageList');
+        if (messageList) {
+            messageList.innerHTML = '';
+        }
     };
     
     ws.onclose = () => {
@@ -18,10 +23,10 @@ function connectWebSocket() {
     };
     
     ws.onmessage = (event) => {
-        console.log('Raw WebSocket data received:', event.data); // 添加这行，检查原始数据
+        console.log('Raw WebSocket data received:', event.data);
         try {
             const message = JSON.parse(event.data);
-            console.log('Parsed message:', message); // 确认解析结果
+            console.log('Parsed message:', message);
             handleMessage(message);
         } catch (error) {
             console.error('Failed to parse WebSocket message:', error, 'Raw data:', event.data);
@@ -29,7 +34,7 @@ function connectWebSocket() {
     };
     
     ws.onerror = (error) => {
-        console.error('WebSocket error:', error); // 添加错误处理
+        console.error('WebSocket error:', error);
     };
 }
 
@@ -44,8 +49,27 @@ function handleMessage(message) {
         }
     }
     
-    // 无论是否当前选中的聊天，都保存消息
-    addMessage(message);
+    // 检查消息是否已存在
+    const chat = chats.get(message.chatId);
+    if (chat) {
+        const messageExists = chat.messages.some(m => 
+            m.messageId === message.messageId && 
+            m.chatId === message.chatId
+        );
+        
+        if (!messageExists) {
+            // 保存新消息
+            addMessage(message);
+            
+            // 如果当前没有选中的聊天，或者收到的是当前选中聊天的消息，则显示消息
+            if (currentChatId === null || message.chatId === currentChatId) {
+                renderMessage(message);
+            } else {
+                // 如果收到的是其他聊天的消息，自动切换到该聊天
+                selectChat(message.chatId);
+            }
+        }
+    }
     
     updateChatList();
 }
@@ -64,7 +88,6 @@ function addMessage(message) {
     if (chat) {
         chat.messages.push(message);
         console.log('Current messages in chat:', chat.messages);
-        renderMessage(message);
     } else {
         console.error('Chat not found for message:', message);
     }

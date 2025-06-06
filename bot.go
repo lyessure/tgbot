@@ -70,7 +70,7 @@ func deliverIncomingMsg(msg api.SimpleMsg) {
 	// 通过WebSocket广播消息
 	web.BroadcastMessage(web.Message{
 		Type:      "message",
-		ChatID:    msg.ChatId,
+		ChatID:    msg.FromID,
 		Name:      msg.Name,
 		Text:      msg.Text,
 		PhotoID:   msg.PhotoID,
