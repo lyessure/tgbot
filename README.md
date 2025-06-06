@@ -15,7 +15,7 @@
 - **Web 操作界面**，类似聊天 APP，消息分会话显示，方便查找和管理
 - 直接访问自己服务器，无需科学上网，不易被屏蔽
 - **所有数据仅保存在内存中**，docker 重启即清空，保护隐私
-- 支持极致隐私模式：将 `BOT_OWNER` 设置为任意无效 ID，消息仅保留在 web，不转发到手机
+- 支持极致隐私模式：将 `BOT_OWNER` 不设置或者设为0，消息仅保留在 web，不转发到手机
 
 ---
 
@@ -41,6 +41,6 @@ services:
     container_name: tg_fwd_web_bot
     environment:
       - BOT_TOKEN=在BotFather获得的token
-      - BOT_OWNER=在userinfobot获得的id（填12345等则不转发到主号）
+      - BOT_OWNER=在userinfobot获得的id。可不设本项。
     ports:
       - "8010:8010"
