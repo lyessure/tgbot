@@ -31,7 +31,8 @@ func main() {
 
 	ownerStr := os.Getenv("BOT_OWNER")
 	if ownerStr == "" {
-		panic("BOT_OWNER environment variable is required")
+		ownerStr = "0"
+		//panic("BOT_OWNER environment variable is required")
 	}
 	var err error
 	owner, err = strconv.ParseInt(ownerStr, 10, 64)
@@ -55,14 +56,16 @@ func deliverIncomingMsg(msg api.SimpleMsg) {
 	fmt.Printf("(%d)%s: %s\n", msg.ChatId, msg.Name, msg.Text)
 	lastreplyid = int(msg.ChatId)
 
-	msgid := api.ForwardMsg(owner, msg.ChatId, msg.MessageID)
-	if msgid == 0 {
-		log.Println("ForwardMsg failed but skip")
-	}
+	if owner != 0 {
+		msgid := api.ForwardMsg(owner, msg.ChatId, msg.MessageID)
+		if msgid == 0 {
+			log.Println("ForwardMsg failed but skip")
+		}
 
-	msgMutex.Lock()
-	msgToChatID[msgid] = msg.ChatId
-	msgMutex.Unlock()
+		msgMutex.Lock()
+		msgToChatID[msgid] = msg.ChatId
+		msgMutex.Unlock()
+	}
 
 	// 通过WebSocket广播消息
 	web.BroadcastMessage(web.Message{
@@ -157,7 +160,9 @@ func directmsg(msg api.SimpleMsg) {
 func handleUpdate(update tgbotapi.Update) {
 	defer func() {
 		if r := recover(); r != nil {
-			api.SendMsg(owner, "Panic in handleUpdate! Check the log for details.")
+			if owner != 0 {
+				api.SendMsg(owner, "Panic in handleUpdate! Check the log for details.")
+			}
 			debug.PrintStack()
 		}
 	}()
