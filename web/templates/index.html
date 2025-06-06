@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram 转发机器人</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <style>
+        body, html { height: 100%; }
+        .main-wrapper { height: 100vh; display: flex; flex-direction: column; }
+        .chat-container { flex: 1 1 0; display: flex; flex-direction: row; height: 100%; min-height: 0; }
+        @media (max-width: 768px) {
+            .chat-container { flex-direction: column; }
+            .chat-list { max-width: 100vw; min-width: 0; }
+            .message-area { max-width: 100vw; min-width: 0; }
+        }
+        .chat-list { background: #f8f9fa; border-right: 1px solid #eee; min-width: 220px; max-width: 320px; overflow-y: auto; }
+        .chat-list-header { padding: 1rem; border-bottom: 1px solid #eee; background: #fff; }
+        .chat-list-body { padding: 0.5rem 0; }
+        .message-area { flex: 1 1 0; display: flex; flex-direction: column; min-width: 0; background: #f4f6fb; }
+        .message-header { padding: 1rem; border-bottom: 1px solid #eee; background: #fff; }
+        .message-body { flex: 1 1 0; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .message-input { background: #fff; border-top: 1px solid #eee; padding: 0.5rem; position: sticky; bottom: 0; z-index: 10; }
+        @media (max-width: 768px) {
+            .chat-list { min-width: 0; max-width: 100vw; }
+            .message-area { min-width: 0; max-width: 100vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="chat-container">
+            <!-- 左侧聊天列表 -->
+            <div class="chat-list">
+                <div class="chat-list-header">
+                    <h4>聊天列表</h4>
+                </div>
+                <div class="chat-list-body" id="chatList">
+                    <!-- 聊天列表将通过JavaScript动态添加 -->
+                </div>
+            </div>
+
+            <!-- 右侧消息区域 -->
+            <div class="message-area">
+                <div class="message-header">
+                    <h4 id="currentChatName">选择一个聊天</h4>
+                </div>
+                <div class="message-body" id="messageList">
+                    <!-- 消息将通过JavaScript动态添加 -->
+                </div>
+                <div class="message-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="messageInput" placeholder="输入消息..." autocomplete="off">
+                        <button class="btn btn-primary" type="button" id="sendButton">
+                            <i class="bi bi-send"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" id="uploadButton">
+                            <i class="bi bi-image"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none" accept="image/*,video/*">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/app.js"></script>
+    <div style="text-align: center; padding: 10px; font-size: 12px; color: #666;">
+     <a href="https://lostshit.com" target="_blank" style="color: #666; text-decoration: none;">开发者</a>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
+                <div class="modal-body p-0 position-relative">
+                    <img id="previewImage" class="img-fluid rounded" style="max-height: 85vh; width: auto; margin: 0 auto; display: block;" alt="预览图片">
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2">
+                        <button type="button" class="btn btn-light btn-sm rounded-circle" data-bs-dismiss="modal" style="width: 40px; height: 40px; padding: 0;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm rounded-circle" id="confirmSend" style="width: 40px; height: 40px; padding: 0;">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
