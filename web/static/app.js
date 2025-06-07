@@ -3,6 +3,7 @@ let currentChatId = null;
 let chats = new Map();
 let previewModal;
 let pendingImageData = null;
+let stickerCache = new Map();  // 添加 sticker 缓存
 let heartbeatInterval;  // 添加心跳间隔变量
 
 function connectWebSocket() {
@@ -133,7 +134,7 @@ function renderMessage(message) {
     
     const infoDiv = document.createElement('div');
     infoDiv.className = 'message-info';
-    infoDiv.textContent = message.name;
+    infoDiv.textContent = `${message.name} · ${message.timestamp || ''}`;
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -165,43 +166,51 @@ function renderMessage(message) {
     if (message.stickerId) {
         console.log('Rendering sticker with ID:', message.stickerId);
         const stickerUrl = `/api/sticker/${encodeURIComponent(message.stickerId)}`;
-        // 先尝试用 <img> 加载
-        const img = document.createElement('img');
-        img.className = 'message-sticker';
-        img.src = stickerUrl;
-        let stickerHandled = false;
-        img.onload = function() {
-            if (!stickerHandled) {
-                console.log('Sticker loaded as image:', message.stickerId);
-                stickerHandled = true;
-            }
-        };
-        img.onerror = function() {
-            if (stickerHandled) return;
-            stickerHandled = true;
-            // 如果 img 加载失败，尝试用 <video> 加载
-            console.log('Sticker is not webp, try as video/webm:', message.stickerId);
-            img.remove();
-            const video = document.createElement('video');
-            video.className = 'message-sticker';
-            video.src = stickerUrl;
-            video.autoplay = true;
-            video.loop = true;
-            video.muted = true;
-            video.playsInline = true;
-            video.onloadeddata = function() {
-                console.log('Sticker loaded as video:', message.stickerId);
+        // 只缓存URL
+        if (stickerCache.has(message.stickerId)) {
+            // 直接新建元素，src用缓存的URL
+            const cachedUrl = stickerCache.get(message.stickerId);
+            const img = document.createElement('img');
+            img.className = 'message-sticker';
+            img.src = cachedUrl;
+            img.onerror = function() {
+                // 如果img加载失败，尝试用<video>
+                const video = document.createElement('video');
+                video.className = 'message-sticker';
+                video.src = cachedUrl;
+                video.autoplay = true;
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                contentDiv.appendChild(video);
+                img.remove();
             };
-            video.onerror = function() {
-                console.error('Failed to load sticker as video:', message.stickerId);
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'image-error';
-                errorDiv.textContent = '贴纸加载失败';
-                contentDiv.appendChild(errorDiv);
+            contentDiv.appendChild(img);
+        } else {
+            // 新建元素并缓存URL
+            const img = document.createElement('img');
+            img.className = 'message-sticker';
+            img.src = stickerUrl;
+            img.onload = function() {
+                stickerCache.set(message.stickerId, stickerUrl);
             };
-            contentDiv.appendChild(video);
-        };
-        contentDiv.appendChild(img);
+            img.onerror = function() {
+                // 如果img加载失败，尝试用<video>
+                const video = document.createElement('video');
+                video.className = 'message-sticker';
+                video.src = stickerUrl;
+                video.autoplay = true;
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.onloadeddata = function() {
+                    stickerCache.set(message.stickerId, stickerUrl);
+                };
+                contentDiv.appendChild(video);
+                img.remove();
+            };
+            contentDiv.appendChild(img);
+        }
     }
     
     if (message.videoId) {
@@ -343,6 +352,19 @@ document.addEventListener('DOMContentLoaded', () => {
             pendingImageData = null;
         }
     });
+});
+
+// 添加清理缓存的函数
+function clearStickerCache() {
+    stickerCache.clear();
+}
+
+// 在页面卸载前清理缓存
+window.addEventListener('beforeunload', () => {
+    clearStickerCache();
+    if (ws) {
+        ws.close();
+    }
 });
 
 // 初始化WebSocket连接

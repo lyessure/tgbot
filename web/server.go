@@ -32,6 +32,7 @@ type Message struct {
 	MessageID int    `json:"messageId"`
 	ReplyID   int    `json:"replyId,omitempty"`
 	File      string `json:"file,omitempty"`
+	Timestamp string `json:"timestamp"`
 }
 
 type Client struct {

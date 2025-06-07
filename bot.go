@@ -9,6 +9,7 @@ import (
 	"runtime/debug"
 	"strconv"
 	"sync"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -77,6 +78,7 @@ func deliverIncomingMsg(msg api.SimpleMsg) {
 		VideoID:   msg.VideoID,
 		StickerID: msg.StickerID,
 		MessageID: msg.MessageID,
+		Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 	})
 }
 
@@ -104,6 +106,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				Name:      "我",
 				Text:      msg.Text,
 				MessageID: msg.MessageID,
+				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 			})
 		} else if msg.PhotoID != "" {
 			api.SendExistingPhoto(storechatid, msg.PhotoID)
@@ -114,6 +117,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				Name:      "我",
 				PhotoID:   msg.PhotoID,
 				MessageID: msg.MessageID,
+				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 			})
 		} else if msg.VideoID != "" {
 			api.SendExistingVideo(storechatid, msg.VideoID)
@@ -124,6 +128,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				Name:      "我",
 				VideoID:   msg.VideoID,
 				MessageID: msg.MessageID,
+				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 			})
 		} else if msg.StickerID != "" {
 			api.SendExistingSticker(storechatid, msg.StickerID)
@@ -134,6 +139,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				Name:      "我",
 				StickerID: msg.StickerID,
 				MessageID: msg.MessageID,
+				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 			})
 		}
 	}

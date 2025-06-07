@@ -133,6 +133,15 @@ body, html {
     opacity: 0.7;
     margin-bottom: 4px;
     font-weight: 400;
+    color: inherit;
+}
+
+.message.sent .message-info {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.message.received .message-info {
+    color: rgba(0, 0, 0, 0.6);
 }
 
 .message-content {
