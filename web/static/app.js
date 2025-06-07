@@ -257,7 +257,6 @@ function selectChat(chatId) {
     const chat = chats.get(chatId);
     if (chat) {
         console.log('Found chat, messages count:', chat.messages.length);
-        document.getElementById('currentChatName').textContent = chat.name;
         const messageList = document.getElementById('messageList');
         messageList.innerHTML = '';
         chat.messages.forEach(msg => {

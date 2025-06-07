@@ -1,61 +1,66 @@
 body, html {
     height: 100%;
-    background: #f4f6fb;
+    background: #e3edf7;
     font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 /* 聊天列表 */
 .chat-list {
-    background-color: #f8f9fa;
-    border-right: 1px solid #dee2e6;
+    background-color: #e3edf7 !important;
+    border-right: none;
+    box-shadow: 4px 0 24px 0 rgba(34,158,217,0.13), 0 1.5px 8px 0 rgba(34,158,217,0.10);
     height: 100vh;
     overflow-y: auto;
     padding: 0;
-    min-width: 200px;
+    min-width: 220px;
     max-width: 320px;
+    border-radius: 18px 0 0 18px;
 }
 @media (max-width: 768px) {
     .chat-list {
         min-width: 0;
         max-width: 100vw;
         height: auto;
-        border-right: none;
-        border-bottom: 1px solid #dee2e6;
+        border-radius: 0;
+        box-shadow: none;
     }
 }
 
 .chat-list-header {
-    padding: 15px;
-    border-bottom: 1px solid #dee2e6;
-    background-color: #ffffff;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e3e6ea;
+    background-color: #e3edf7 !important;
     position: sticky;
     top: 0;
     z-index: 1;
+    border-radius: 18px 0 0 0;
 }
 
 .chat-list-body {
-    padding: 10px;
+    padding: 10px 0;
 }
 
 .chat-item {
-    padding: 14px 18px;
-    margin-bottom: 6px;
-    border-radius: 12px;
+    padding: 16px 22px;
+    margin-bottom: 8px;
+    border-radius: 16px;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    background-color: #fff;
-    border: 1px solid #e9ecef;
-    font-size: 17px;
-    color: #333;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    background: #e3edf7 !important;
+    border: none;
+    font-size: 18px;
+    color: #22344d !important;
     font-weight: 500;
+    box-shadow: 0 1px 4px rgba(34,158,217,0.04);
 }
 .chat-item:hover {
-    background-color: #e9ecef;
+    background: #d0e3f3;
+    color: #007bff;
 }
 .chat-item.active {
-    background-color: #007bff;
+    background: linear-gradient(90deg, #229ED9 80%, #70cfff 100%);
     color: #fff;
-    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(34,158,217,0.12);
 }
 
 /* 消息区 */
@@ -63,34 +68,39 @@ body, html {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: #f4f6fb;
+    background: #eaf3fa;
     min-width: 0;
+    border-radius: 0 18px 18px 0;
+    box-shadow: 0 0 24px 0 rgba(34,158,217,0.08);
 }
 @media (max-width: 768px) {
     .message-area {
         min-width: 0;
         max-width: 100vw;
         height: calc(100vh - 60px);
+        border-radius: 0;
+        box-shadow: none;
     }
 }
 
 .message-header {
-    padding: 15px;
-    border-bottom: 1px solid #dee2e6;
-    background-color: #fff;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e3e6ea;
+    background: #eaf3fa;
     position: sticky;
     top: 0;
     z-index: 1;
+    border-radius: 0 18px 0 0;
 }
 
 .message-body {
     flex: 1;
     overflow-y: auto;
-    padding: 18px 6vw 18px 6vw;
-    background-color: #f1f3f5;
+    padding: 24px 6vw 24px 6vw;
+    background: #eaf3fa !important;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
 }
 @media (max-width: 768px) {
     .message-body {
@@ -102,34 +112,37 @@ body, html {
     max-width: 90vw;
     width: fit-content;
     margin-bottom: 10px;
-    padding: 12px 18px;
-    border-radius: 18px;
+    padding: 16px 22px;
+    border-radius: 22px;
     position: relative;
     word-break: break-word;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    font-size: 16px;
-    line-height: 1.6;
+    box-shadow: 0 2px 12px rgba(34,158,217,0.04);
+    font-size: 17px;
+    line-height: 1.7;
+    border: none;
+    color: #22344d;
 }
 .message.sent {
-    background: linear-gradient(135deg, #007bff 80%, #339dff 100%);
-    color: #fff;
+    background: linear-gradient(135deg, #229ED9 80%, #70cfff 100%) !important;
+    color: #fff !important;
     margin-left: auto;
-    border-bottom-right-radius: 6px;
+    border-bottom-right-radius: 8px;
     align-items: flex-end;
+    box-shadow: 0 4px 16px rgba(34,158,217,0.13);
 }
 .message.received {
-    background: #fff;
-    color: #333;
+    background: #eaf3fa;
+    color: #22344d;
     margin-right: auto;
-    border: 1px solid #e3e6ea;
-    border-bottom-left-radius: 6px;
+    border-bottom-left-radius: 8px;
     align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(34,158,217,0.06);
 }
 
 .message-info {
-    font-size: 12px;
+    font-size: 13px;
     opacity: 0.7;
     margin-bottom: 4px;
     font-weight: 400;
@@ -141,23 +154,25 @@ body, html {
 }
 
 .message.received .message-info {
-    color: rgba(0, 0, 0, 0.6);
+    color: #229ED9;
+    opacity: 0.6;
 }
 
 .message-content {
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 17px;
+    line-height: 1.6;
     word-break: break-word;
 }
 
 .message-image, .message-video, .message-sticker {
     max-width: 60vw;
     max-height: 40vh;
-    border-radius: 10px;
+    border-radius: 14px;
     margin-top: 7px;
     object-fit: contain;
     display: block;
-    background: #f8f9fa;
+    background: #f6fafd;
+    box-shadow: 0 1px 6px rgba(34,158,217,0.10);
 }
 @media (max-width: 768px) {
     .message-image, .message-video, .message-sticker {
@@ -169,77 +184,73 @@ body, html {
 .message-sticker {
     max-width: 128px;
     max-height: 128px;
-    border-radius: 10px;
+    border-radius: 14px;
     margin: 7px 0;
     display: block;
-    background: #f8f9fa;
-}
-
-.loading-indicator {
-    color: #666;
-    font-size: 12px;
-    margin: 5px 0;
-    text-align: center;
-}
-
-.image-error,
-.video-error {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
-    padding: 5px;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
+    background: #f6fafd;
 }
 
 /* 输入区 */
 .message-input {
-    padding: 10px 6vw 10px 6vw;
-    border-top: 1px solid #dee2e6;
-    background: #fff;
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-}
-@media (max-width: 768px) {
-    .message-input {
-        padding: 8px 2vw 8px 2vw;
-    }
+    padding: 12px 6vw 12px 6vw;
+    border-top: 1px solid #e3e6ea;
+    background: #eaf3fa;
+    border-radius: 0 0 18px 0;
+    box-shadow: 0 -2px 8px rgba(34,158,217,0.04);
 }
 .input-group {
-    align-items: center;
-    gap: 8px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(34,158,217,0.07);
+    background: #f6fafd;
 }
 .form-control {
-    border-radius: 22px;
-    padding: 12px 18px;
-    font-size: 16px;
-    background: #f8f9fa;
-    border: 1px solid #e3e6ea;
+    border: none;
+    border-radius: 0;
+    background: #f6fafd;
+    font-size: 17px;
+    padding: 14px 18px;
+    box-shadow: none;
+}
+.form-control:focus {
+    background: #e3f2fd;
+    outline: none;
+    box-shadow: 0 0 0 2px #229ED933;
 }
 .btn-primary, .btn-outline-secondary {
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 0;
     font-size: 20px;
-    padding: 0;
+    padding: 0 18px;
+    border: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: none;
 }
-.btn-primary i, .btn-outline-secondary i {
-    font-size: 20px;
+.btn-primary {
+    background: linear-gradient(90deg, #229ED9 80%, #70cfff 100%);
+    color: #fff;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: #229ED9;
+    color: #fff;
+    box-shadow: 0 2px 8px #229ED955;
+}
+.btn-outline-secondary {
+    background: #eaf3fa;
+    color: #229ED9;
+}
+.btn-outline-secondary:hover, .btn-outline-secondary:focus {
+    background: #e3f2fd;
+    color: #007bff;
+    box-shadow: 0 2px 8px #229ED933;
 }
 
-/* 滚动条美化 */
-.message-body::-webkit-scrollbar, .chat-list::-webkit-scrollbar {
-    width: 6px;
-    background: #f1f3f5;
+::-webkit-scrollbar {
+    width: 8px;
+    background: #e9f5fb;
 }
-.message-body::-webkit-scrollbar-thumb, .chat-list::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
+::-webkit-scrollbar-thumb {
+    background: #b3e0f7;
+    border-radius: 8px;
 }
 
 /* 适配小屏幕 */
@@ -253,5 +264,76 @@ body, html {
     }
     .message-input {
         padding: 6px 1vw 6px 1vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-wrapper {
+        height: 100vh !important;
+        min-height: 100vh !important;
+        padding: 0 !important;
+        background: #eaf3fa !important;
+    }
+    .chat-container {
+        border-radius: 0 !important;
+        min-width: 0 !important;
+        max-width: 100vw !important;
+        width: 100vw !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+    .chat-list {
+        border-radius: 0 !important;
+        min-width: 0 !important;
+        max-width: 100vw !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+    .chat-list-header {
+        border-radius: 0 !important;
+        padding: 10px 12px !important;
+        font-size: 18px !important;
+    }
+    .chat-item {
+        padding: 12px 14px !important;
+        font-size: 16px !important;
+        margin-bottom: 4px !important;
+    }
+    .message-area {
+        border-radius: 0 !important;
+        min-width: 0 !important;
+        max-width: 100vw !important;
+        box-shadow: none !important;
+    }
+    .message-body {
+        padding: 10px 2vw 10px 2vw !important;
+        gap: 8px !important;
+    }
+    .message {
+        font-size: 15px !important;
+        padding: 10px 12px !important;
+        border-radius: 14px !important;
+    }
+    .message-image, .message-video, .message-sticker {
+        max-width: 96vw !important;
+        max-height: 28vh !important;
+        border-radius: 10px !important;
+    }
+    .message-input {
+        padding: 6px 2vw 6px 2vw !important;
+        border-radius: 0 !important;
+    }
+    .input-group {
+        border-radius: 10px !important;
+    }
+    .form-control {
+        font-size: 16px !important;
+        padding: 10px 12px !important;
+    }
+    .btn-primary, .btn-outline-secondary {
+        font-size: 22px !important;
+        padding: 0 14px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
     }
 }
