@@ -130,7 +130,9 @@ function renderMessage(message) {
     }
 
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${message.chatId === currentChatId ? 'sent' : 'received'}`;
+    // 判断消息是自己发的还是收到的
+    const isSent = message.name === '我';
+    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
     
     const infoDiv = document.createElement('div');
     infoDiv.className = 'message-info';

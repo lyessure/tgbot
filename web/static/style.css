@@ -127,20 +127,22 @@ body, html {
     color: #22344d;
 }
 .message.sent {
-    background: linear-gradient(135deg, #229ED9 80%, #70cfff 100%) !important;
-    color: #fff !important;
+    background: #eaf3fa !important;
+    color: #22344d !important;
     margin-left: auto;
+    margin-right: 0;
     border-bottom-right-radius: 8px;
     align-items: flex-end;
-    box-shadow: 0 4px 16px rgba(34,158,217,0.13);
+    box-shadow: 0 2px 8px rgba(34,158,217,0.06);
 }
 .message.received {
-    background: #eaf3fa;
-    color: #22344d;
+    background: linear-gradient(135deg, #229ED9 80%, #70cfff 100%) !important;
+    color: #fff !important;
     margin-right: auto;
+    margin-left: 0;
     border-bottom-left-radius: 8px;
     align-items: flex-start;
-    box-shadow: 0 2px 8px rgba(34,158,217,0.06);
+    box-shadow: 0 4px 16px rgba(34,158,217,0.13);
 }
 
 .message-info {
@@ -152,12 +154,12 @@ body, html {
 }
 
 .message.sent .message-info {
-    color: rgba(255, 255, 255, 0.9);
+    color: #229ED9;
+    opacity: 0.6;
 }
 
 .message.received .message-info {
-    color: #229ED9;
-    opacity: 0.6;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .message-content {
