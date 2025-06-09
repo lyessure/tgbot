@@ -60,7 +60,9 @@ body, html {
 .chat-item.active {
     background: linear-gradient(90deg, #229ED9 80%, #70cfff 100%);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(34,158,217,0.12);
+    box-shadow: 0 8px 32px 0 rgba(34,158,217,0.28), 0 2px 16px 0 rgba(34,158,217,0.18);
+    transform: scale(1.04);
+    z-index: 3;
 }
 
 /* 消息区 */
@@ -335,5 +337,21 @@ body, html {
         padding: 0 14px !important;
         min-width: 44px !important;
         min-height: 44px !important;
+    }
+}
+
+.chat-divider {
+    width: 3px;
+    background: linear-gradient(180deg, #e3e6ea 60%, #d0e3f3 100%);
+    box-shadow: 4px 0 24px 0 rgba(34,158,217,0.18), 0 2px 12px 0 rgba(34,158,217,0.10);
+    height: 100vh;
+    align-self: stretch;
+    margin: 0 0px;
+    border-radius: 2px;
+    z-index: 2;
+}
+@media (max-width: 768px) {
+    .chat-divider {
+        display: none;
     }
 }
