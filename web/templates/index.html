@@ -76,18 +76,23 @@
 
     <!-- 图片预览模态框 -->
     <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
-                <div class="modal-body p-0 position-relative">
-                    <img id="previewImage" class="img-fluid rounded" style="max-height: 85vh; width: auto; margin: 0 auto; display: block;" alt="预览图片">
-                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2">
-                        <button type="button" class="btn btn-light btn-sm rounded-circle" data-bs-dismiss="modal" style="width: 40px; height: 40px; padding: 0;">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm rounded-circle" id="confirmSend" style="width: 40px; height: 40px; padding: 0;">
-                            <i class="bi bi-send"></i>
-                        </button>
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 90vw; max-height: 90vh;">
+            <div class="modal-content" style="border-radius: 24px; overflow: hidden; box-shadow: 0 12px 48px rgba(34,158,217,0.25), 0 4px 24px rgba(34,158,217,0.15); border: none; background: linear-gradient(135deg, #f6fafd 0%, #eaf3fa 100%);">
+                <div class="modal-header" style="padding: 1.25rem 1.5rem; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(34,158,217,0.1);">
+                    <h5 class="modal-title" style="color: #229ED9; font-weight: 600; font-size: 1.25rem; margin: 0;">
+                        <i class="bi bi-image me-2"></i>图片预览
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭" style="background-color: rgba(34,158,217,0.2); border-radius: 50%; width: 32px; height: 32px; padding: 8px; transition: all 0.2s ease;"></button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); text-align: center; overflow: auto; max-height: 70vh;">
+                    <div style="background: rgba(255,255,255,0.9); border-radius: 16px; padding: 1rem; box-shadow: 0 4px 24px rgba(34,158,217,0.1); display: inline-block;">
+                        <img id="previewImage" alt="预览图片" style="border-radius: 8px; box-shadow: 0 2px 12px rgba(34,158,217,0.1);">
                     </div>
+                </div>
+                <div class="modal-footer" style="padding: 1.25rem 1.5rem; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(34,158,217,0.1); justify-content: center;">
+                    <button type="button" class="btn btn-primary" id="confirmSend" style="background: linear-gradient(135deg, #229ED9 0%, #70cfff 100%); border: none; padding: 0.75rem 2rem; border-radius: 12px; font-weight: 500; box-shadow: 0 4px 16px rgba(34,158,217,0.2); transition: all 0.2s ease;">
+                        <i class="bi bi-send me-2"></i>发送图片
+                    </button>
                 </div>
             </div>
         </div>

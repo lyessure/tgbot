@@ -70,15 +70,16 @@ func deliverIncomingMsg(msg api.SimpleMsg) {
 
 	// 通过WebSocket广播消息
 	web.BroadcastMessage(web.Message{
-		Type:      "message",
-		ChatID:    msg.FromID,
-		Name:      msg.Name,
-		Text:      msg.Text,
-		PhotoID:   msg.PhotoID,
-		VideoID:   msg.VideoID,
-		StickerID: msg.StickerID,
-		MessageID: msg.MessageID,
-		Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+		Type:         "message",
+		ChatID:       msg.FromID,
+		Name:         msg.Name,
+		Text:         msg.Text,
+		PhotoID:      msg.PhotoID,      // 缩略图
+		PhotoLargeID: msg.PhotoLargeID, // 原图
+		VideoID:      msg.VideoID,
+		StickerID:    msg.StickerID,
+		MessageID:    msg.MessageID,
+		Timestamp:    time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 	})
 }
 
@@ -107,6 +108,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				Text:      msg.Text,
 				MessageID: msg.MessageID,
 				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+				IsFromMe:  true,
 			})
 		} else if msg.PhotoID != "" {
 			api.SendExistingPhoto(storechatid, msg.PhotoID)
@@ -118,6 +120,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				PhotoID:   msg.PhotoID,
 				MessageID: msg.MessageID,
 				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+				IsFromMe:  true,
 			})
 		} else if msg.VideoID != "" {
 			api.SendExistingVideo(storechatid, msg.VideoID)
@@ -129,6 +132,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				VideoID:   msg.VideoID,
 				MessageID: msg.MessageID,
 				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+				IsFromMe:  true,
 			})
 		} else if msg.StickerID != "" {
 			api.SendExistingSticker(storechatid, msg.StickerID)
@@ -140,6 +144,7 @@ func deliverOutgoingMsg(msg api.SimpleMsg) {
 				StickerID: msg.StickerID,
 				MessageID: msg.MessageID,
 				Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+				IsFromMe:  true,
 			})
 		}
 	}

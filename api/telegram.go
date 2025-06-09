@@ -13,16 +13,17 @@ var (
 )
 
 type SimpleMsg struct {
-	Type      string
-	FromID    int64
-	MessageID int
-	ReplyID   int
-	Text      string
-	PhotoID   string
-	VideoID   string
-	StickerID string
-	ChatId    int64
-	Name      string
+	Type         string
+	FromID       int64
+	MessageID    int
+	ReplyID      int
+	Text         string
+	PhotoID      string // 缩略图ID
+	PhotoLargeID string // 原图ID
+	VideoID      string
+	StickerID    string
+	ChatId       int64
+	Name         string
 }
 
 type BotHandler func(update tgbotapi.Update)
@@ -70,7 +71,10 @@ func FormatMsg(update tgbotapi.Update) SimpleMsg {
 	}
 	if update.Message.Photo != nil {
 		if len(update.Message.Photo) > 0 {
+			// 保存缩略图ID（用于聊天窗口显示）
 			msg.PhotoID = update.Message.Photo[0].FileID
+			// 保存原图ID（用于点击放大后显示）
+			msg.PhotoLargeID = update.Message.Photo[len(update.Message.Photo)-1].FileID
 		}
 	}
 	if update.Message.Video != nil {

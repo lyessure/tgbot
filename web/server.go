@@ -22,17 +22,19 @@ var upgrader = websocket.Upgrader{
 }
 
 type Message struct {
-	Type      string `json:"type"`
-	ChatID    int64  `json:"chatId"`
-	Name      string `json:"name"`
-	Text      string `json:"text"`
-	PhotoID   string `json:"photoId,omitempty"`
-	VideoID   string `json:"videoId,omitempty"`
-	StickerID string `json:"stickerId,omitempty"`
-	MessageID int    `json:"messageId"`
-	ReplyID   int    `json:"replyId,omitempty"`
-	File      string `json:"file,omitempty"`
-	Timestamp string `json:"timestamp"`
+	Type         string `json:"type"`
+	ChatID       int64  `json:"chatId"`
+	Name         string `json:"name"`
+	Text         string `json:"text"`
+	PhotoID      string `json:"photoId,omitempty"`      // 缩略图ID
+	PhotoLargeID string `json:"photoLargeId,omitempty"` // 原图ID
+	VideoID      string `json:"videoId,omitempty"`
+	StickerID    string `json:"stickerId,omitempty"`
+	MessageID    int    `json:"messageId"`
+	ReplyID      int    `json:"replyId,omitempty"`
+	File         string `json:"file,omitempty"`
+	Timestamp    string `json:"timestamp"`
+	IsFromMe     bool   `json:"isFromMe,omitempty"` // 标识是否是我们发送的消息
 }
 
 type Client struct {
@@ -164,6 +166,8 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 					Name:      "我",
 					Text:      msg.Text,
 					MessageID: int(time.Now().UnixNano()),
+					Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+					IsFromMe:  true, // 标记为我们发送的消息
 				}
 				messageHistory.AddMessage(sentMsg)
 				// 广播发送的消息
@@ -199,6 +203,8 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 						Name:      "我",
 						PhotoID:   photoID,
 						MessageID: int(time.Now().UnixNano()),
+						Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+						IsFromMe:  true, // 标记为我们发送的消息
 					}
 					messageHistory.AddMessage(sentMsg)
 					// 广播发送的图片消息
@@ -214,6 +220,8 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 					Name:      "我",
 					VideoID:   msg.VideoID,
 					MessageID: int(time.Now().UnixNano()),
+					Timestamp: time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
+					IsFromMe:  true, // 标记为我们发送的消息
 				}
 				messageHistory.AddMessage(sentMsg)
 				// 广播发送的视频消息
@@ -254,6 +262,12 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 func BroadcastMessage(msg Message) {
 	log.Printf("broadcasting message: %+v", msg)
 	if globalServer != nil {
+		// 如果是我们发送的消息，不需要再次广播
+		if msg.IsFromMe {
+			return
+		}
+		// 设置消息接收时间
+		msg.Timestamp = time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05")
 		// 保存消息到历史记录
 		messageHistory.AddMessage(msg)
 

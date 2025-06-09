@@ -127,13 +127,13 @@ body, html {
     color: #22344d;
 }
 .message.sent {
-    background: #eaf3fa !important;
-    color: #22344d !important;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+    color: #1565c0 !important;
     margin-left: auto;
     margin-right: 0;
     border-bottom-right-radius: 8px;
     align-items: flex-end;
-    box-shadow: 0 2px 8px rgba(34,158,217,0.06);
+    box-shadow: 0 2px 12px rgba(34,158,217,0.08);
 }
 .message.received {
     background: linear-gradient(135deg, #229ED9 80%, #70cfff 100%) !important;
@@ -154,8 +154,8 @@ body, html {
 }
 
 .message.sent .message-info {
-    color: #229ED9;
-    opacity: 0.6;
+    color: #1565c0;
+    opacity: 0.7;
 }
 
 .message.received .message-info {
@@ -177,6 +177,16 @@ body, html {
     display: block;
     background: #f6fafd;
     box-shadow: 0 1px 6px rgba(34,158,217,0.10);
+}
+
+.message-image {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 12px rgba(34,158,217,0.15);
 }
 @media (max-width: 768px) {
     .message-image, .message-video, .message-sticker {
@@ -356,4 +366,54 @@ body, html {
     .chat-divider {
         display: none;
     }
+}
+
+/* 图片预览模态框样式 */
+#previewModal .modal-content {
+    transition: transform 0.3s ease-out !important;
+}
+
+#previewModal.show .modal-content {
+    transform: translateY(0) scale(1) !important;
+}
+
+#previewModal .modal-dialog {
+    transition: transform 0.3s ease-out !important;
+}
+
+#previewModal .btn-close {
+    background-color: rgba(34,158,217,0.2) !important;
+    opacity: 1 !important;
+    transition: all 0.2s ease !important;
+}
+
+#previewModal .btn-close:hover {
+    background-color: rgba(34,158,217,0.3) !important;
+    transform: rotate(90deg) !important;
+}
+
+#previewModal #confirmSend {
+    transition: all 0.2s ease !important;
+}
+
+#previewModal #confirmSend:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(34,158,217,0.3) !important;
+}
+
+#previewModal .modal-header,
+#previewModal .modal-body,
+#previewModal .modal-footer {
+    transition: background-color 0.3s ease !important;
+}
+
+#previewModal .modal-header:hover,
+#previewModal .modal-footer:hover {
+    background: rgba(255,255,255,0.95) !important;
+}
+
+/* 确保图片不受CSS限制 */
+#previewImage {
+    user-select: none;
+    transition: transform 0.3s ease !important;
 }

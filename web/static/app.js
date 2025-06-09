@@ -66,6 +66,15 @@ function stopHeartbeat() {
     }
 }
 
+function formatTimestamp(ts) {
+    // 只保留 MM-DD HH:mm:ss
+    if (!ts) return '';
+    // 支持 "YYYY-MM-DD HH:mm:ss" 或 "MM-DD HH:mm:ss"
+    const match = ts.match(/(\d{2,4}-)?(\d{2}-\d{2} \d{2}:\d{2}:\d{2})/);
+    if (match) return match[2];
+    return ts;
+}
+
 function handleMessage(message) {
     console.log('Received message:', message);
     if (!chats.has(message.chatId)) {
@@ -136,7 +145,16 @@ function renderMessage(message) {
     
     const infoDiv = document.createElement('div');
     infoDiv.className = 'message-info';
-    infoDiv.textContent = `${message.name} · ${message.timestamp || ''}`;
+    // 确保时间戳存在，如果不存在则创建一个
+    const timestamp = formatTimestamp(message.timestamp || new Date().toLocaleString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    }).replace(/\//g, '-'));
+    infoDiv.textContent = `${message.name} · ${timestamp}`;
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -149,7 +167,8 @@ function renderMessage(message) {
         console.log('Rendering photo with ID:', message.photoId);
         const img = document.createElement('img');
         img.className = 'message-image';
-        img.src = `/api/photo/${message.photoId}`;
+        img.src = `/api/photo/${message.photoId}`; // 使用缩略图
+        img.dataset.largeId = message.photoLargeId; // 保存原图ID
         img.onload = function() {
             console.log('Image loaded successfully:', message.photoId);
         };
@@ -276,12 +295,24 @@ function sendMessage() {
     const text = input.value.trim();
     
     if (text && currentChatId) {
+        const timestamp = new Date().toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).replace(/\//g, '-');
+
         const message = {
             type: 'send',
             chatId: currentChatId,
-            text: text
+            text: text,
+            timestamp: timestamp
         };
         
+        // 只通过WebSocket发送，不做本地立即渲染
         ws.send(JSON.stringify(message));
         input.value = '';
     }
@@ -346,13 +377,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const message = {
                 type: 'send_photo',
                 chatId: currentChatId,
-                file: pendingImageData
+                file: pendingImageData,
+                timestamp: new Date().toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).replace(/\//g, '-')
             };
             ws.send(JSON.stringify(message));
             previewModal.hide();
             pendingImageData = null;
         }
     });
+    enableImageZoom();
 });
 
 // 添加清理缓存的函数
@@ -369,4 +410,82 @@ window.addEventListener('beforeunload', () => {
 });
 
 // 初始化WebSocket连接
-connectWebSocket(); 
+connectWebSocket();
+
+// 在页面图片上添加点击放大预览功能
+function enableImageZoom() {
+    document.getElementById('messageList').addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('message-image')) {
+            const previewImage = document.getElementById('previewImage');
+            const largeImageId = e.target.dataset.largeId;
+            
+            if (!largeImageId) {
+                console.error('No large image ID found');
+                return;
+            }
+            
+            // 使用原图URL
+            const largeImageUrl = `/api/photo/${largeImageId}`;
+            
+            // 创建一个新的Image对象来获取原始尺寸
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                // 获取原始尺寸和窗口尺寸
+                const naturalWidth = tempImg.naturalWidth;
+                const naturalHeight = tempImg.naturalHeight;
+                const windowWidth = window.innerWidth * 0.9;  // 90%的窗口宽度
+                const windowHeight = window.innerHeight * 0.8; // 80%的窗口高度
+                
+                console.log(`图片原始尺寸: ${naturalWidth} x ${naturalHeight}`);
+                console.log(`可用窗口尺寸: ${windowWidth} x ${windowHeight}`);
+                
+                // 计算缩放比例
+                let scale = 1;
+                if (naturalWidth > windowWidth || naturalHeight > windowHeight) {
+                    // 如果图片超出窗口，计算合适的缩放比例
+                    const scaleX = windowWidth / naturalWidth;
+                    const scaleY = windowHeight / naturalHeight;
+                    scale = Math.min(scaleX, scaleY);
+                }
+                
+                // 计算缩放后的尺寸
+                const scaledWidth = naturalWidth * scale;
+                const scaledHeight = naturalHeight * scale;
+                
+                console.log(`缩放比例: ${scale}, 显示尺寸: ${scaledWidth} x ${scaledHeight}`);
+                
+                // 设置预览图片的样式
+                previewImage.style.cssText = `
+                    width: ${scaledWidth}px !important;
+                    height: ${scaledHeight}px !important;
+                    object-fit: contain !important;
+                    display: block !important;
+                    margin: 0 auto !important;
+                    border: none !important;
+                    outline: none !important;
+                    transition: width 0.3s, height 0.3s !important;
+                `;
+                
+                // 设置图片源为原图
+                previewImage.src = largeImageUrl;
+            };
+            
+            // 加载原图
+            tempImg.src = largeImageUrl;
+            
+            // 隐藏发送按钮（用于查看图片）
+            document.getElementById('confirmSend').style.display = 'none';
+            previewModal.show();
+            
+            console.log('显示图片预览:', largeImageUrl);
+        }
+    });
+    
+    // 关闭模态框时重置样式
+    document.getElementById('previewModal').addEventListener('hidden.bs.modal', function() {
+        const previewImage = document.getElementById('previewImage');
+        previewImage.style.cssText = '';
+        previewImage.src = '';  // 清除图片源
+        document.getElementById('confirmSend').style.display = '';
+    });
+} 
