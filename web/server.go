@@ -26,6 +26,7 @@ type Message struct {
 	Type         string `json:"type"`
 	ChatID       int64  `json:"chatId"`
 	Name         string `json:"name"`
+	Username     string `json:"username"`
 	Text         string `json:"text"`
 	PhotoID      string `json:"photoId,omitempty"`      // 缩略图ID
 	PhotoLargeID string `json:"photoLargeId,omitempty"` // 原图ID

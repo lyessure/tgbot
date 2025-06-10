@@ -12,18 +12,9 @@ function connectWebSocket() {
     
     ws.onopen = () => {
         console.log('WebSocket connected');
-        // 连接成功后，如果当前有选中的聊天，重新显示其消息
+        // 连接成功后，如果当前有选中的聊天，直接调用 selectChat，确保用户信息头部也被渲染
         if (currentChatId) {
-            const chat = chats.get(currentChatId);
-            if (chat) {
-                const messageList = document.getElementById('messageList');
-                if (messageList) {
-                    messageList.innerHTML = '';
-                    chat.messages.forEach(msg => {
-                        renderMessage(msg);
-                    });
-                }
-            }
+            selectChat(currentChatId);
         }
     };
     
@@ -79,30 +70,34 @@ function handleMessage(message) {
     console.log('Received message:', message);
     if (!chats.has(message.chatId)) {
         console.log('New chat detected:', message.chatId);
-        addChat(message.chatId, message.name);
+        addChat(message.chatId, message.name, message.username);
         if (currentChatId === null) {
             console.log('Auto-selecting first chat:', message.chatId);
             selectChat(message.chatId);
         }
     }
     
-    // 检查消息是否已存在
     const chat = chats.get(message.chatId);
     if (chat) {
+        // Update username if it's not set
+        if (!chat.username && message.username) {
+            chat.username = message.username;
+            if (message.chatId === currentChatId) {
+                selectChat(message.chatId); // Refresh display to show username
+            }
+        }
+        
         const messageExists = chat.messages.some(m => 
             m.messageId === message.messageId && 
             m.chatId === message.chatId
         );
         
         if (!messageExists) {
-            // 保存新消息
             addMessage(message);
             
-            // 如果当前没有选中的聊天，或者收到的是当前选中聊天的消息，则显示消息
             if (currentChatId === null || message.chatId === currentChatId) {
                 renderMessage(message);
             } else {
-                // 如果收到的是其他聊天的消息，自动切换到该聊天
                 selectChat(message.chatId);
             }
         }
@@ -111,12 +106,18 @@ function handleMessage(message) {
     updateChatList();
 }
 
-function addChat(chatId, name) {
-    chats.set(chatId, {
-        id: chatId,
-        name: name,
-        messages: []
-    });
+function addChat(chatId, name, username) {
+    console.log('Adding chat:', { chatId, name, username });  // Debug log
+    if (!chats.has(chatId)) {
+        chats.set(chatId, {
+            id: chatId,
+            name: name,
+            username: username,
+            messages: []
+        });
+        console.log('Chat added:', chats.get(chatId));  // Debug log
+        updateChatList();
+    }
 }
 
 function addMessage(message) {
@@ -263,24 +264,28 @@ function updateChatList() {
     const chatList = document.getElementById('chatList');
     chatList.innerHTML = '';
     
-    chats.forEach((chat) => {
-        const chatDiv = document.createElement('div');
-        chatDiv.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
-        // 新增头像
+    chats.forEach((chat, chatId) => {
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.dataset.chatId = chatId;
+        if (chatId === currentChatId) {
+            chatItem.classList.add('active');
+        }
+        // 头像
         const avatar = document.createElement('img');
         avatar.className = 'chat-avatar';
         avatar.src = `/api/avatar/${chat.id}`;
         avatar.onerror = function() {
             this.src = '/static/default-avatar.png';
         };
-        chatDiv.appendChild(avatar);
+        chatItem.appendChild(avatar);
         // 名字
         const nameSpan = document.createElement('span');
         nameSpan.textContent = chat.name;
         nameSpan.style.marginLeft = '12px';
-        chatDiv.appendChild(nameSpan);
-        chatDiv.onclick = () => selectChat(chat.id);
-        chatList.appendChild(chatDiv);
+        chatItem.appendChild(nameSpan);
+        chatItem.onclick = () => selectChat(chatId);
+        chatList.appendChild(chatItem);
     });
 }
 
@@ -288,18 +293,34 @@ function selectChat(chatId) {
     console.log('Selecting chat:', chatId);
     currentChatId = chatId;
     const chat = chats.get(chatId);
+    console.log('Chat data:', chat);  // Debug log
+    
     if (chat) {
-        console.log('Found chat, messages count:', chat.messages.length);
         const messageList = document.getElementById('messageList');
         messageList.innerHTML = '';
+        
+        // Always add user info header
+        const userInfoHeader = document.createElement('div');
+        userInfoHeader.className = 'user-info-header';
+        userInfoHeader.textContent = `对方用户名: @${chat.username || 'unknown'} 用户ID: ${chat.id}`;
+        messageList.appendChild(userInfoHeader);
+        console.log('Added user info header:', userInfoHeader.textContent);  // Debug log
+        
         chat.messages.forEach(msg => {
-            console.log('Rendering message from history:', msg);
             renderMessage(msg);
         });
-    } else {
-        console.error('Chat not found:', chatId);
+        
+        // Update active state in chat list
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.chatId === String(chatId)) {
+                item.classList.add('active');
+            }
+        });
+        
+        // Scroll to bottom
+        messageList.scrollTop = messageList.scrollHeight;
     }
-    updateChatList();
 }
 
 function sendMessage() {

@@ -73,6 +73,7 @@ func deliverIncomingMsg(msg api.SimpleMsg) {
 		Type:         "message",
 		ChatID:       msg.FromID,
 		Name:         msg.Name,
+		Username:     msg.Username,
 		Text:         msg.Text,
 		PhotoID:      msg.PhotoID,      // 缩略图
 		PhotoLargeID: msg.PhotoLargeID, // 原图

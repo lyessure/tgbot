@@ -24,6 +24,7 @@ type SimpleMsg struct {
 	StickerID    string
 	ChatId       int64
 	Name         string
+	Username     string // Add username field
 }
 
 type BotHandler func(update tgbotapi.Update)
@@ -62,6 +63,7 @@ func FormatMsg(update tgbotapi.Update) SimpleMsg {
 	}
 	if update.Message.From != nil {
 		msg.FromID = update.Message.From.ID
+		msg.Username = update.Message.From.UserName // Add username
 	}
 	msg.MessageID = update.Message.MessageID
 	msg.Text = update.Message.Text
