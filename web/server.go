@@ -303,6 +303,7 @@ func StartWebServer(port string) {
 			c.String(http.StatusNotFound, "Photo not found")
 			return
 		}
+		c.Header("Cache-Control", "public, max-age=31536000, immutable")
 		c.DataFromReader(http.StatusOK, file.FileSize, "image/jpeg", file.Reader, nil)
 	})
 
@@ -333,6 +334,7 @@ func StartWebServer(port string) {
 			return
 		}
 		log.Printf("Successfully got sticker file, size: %d", file.FileSize)
+		c.Header("Cache-Control", "public, max-age=31536000, immutable")
 		c.DataFromReader(http.StatusOK, file.FileSize, "image/webp", file.Reader, nil)
 	})
 

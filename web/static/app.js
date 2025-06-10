@@ -5,6 +5,7 @@ let previewModal;
 let pendingImageData = null;
 let stickerCache = new Map();  // 添加 sticker 缓存
 let heartbeatInterval;  // 添加心跳间隔变量
+let lastChatSnapshot = null; // 新增：记录上次聊天快照
 
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -12,10 +13,11 @@ function connectWebSocket() {
     
     ws.onopen = () => {
         console.log('WebSocket connected');
-        // 连接成功后，如果当前有选中的聊天，直接调用 selectChat，确保用户信息头部也被渲染
-        if (currentChatId) {
-            selectChat(currentChatId);
+        // 连接成功后，如果当前有选中的聊天，记录快照，不立即 selectChat
+        if (currentChatId && chats.has(currentChatId)) {
+            lastChatSnapshot = JSON.stringify(chats.get(currentChatId).messages);
         }
+        // 不立即 selectChat(currentChatId);
     };
     
     ws.onclose = () => {
@@ -104,6 +106,14 @@ function handleMessage(message) {
     }
     
     updateChatList();
+    // 新增：重连后只在内容变化时刷新 selectChat
+    if (currentChatId && chats.has(currentChatId)) {
+        const now = JSON.stringify(chats.get(currentChatId).messages);
+        if (lastChatSnapshot !== null && lastChatSnapshot !== now) {
+            selectChat(currentChatId);
+            lastChatSnapshot = now;
+        }
+    }
 }
 
 function addChat(chatId, name, username) {
