@@ -51,7 +51,7 @@ services:
 
 我是后端技术，前端UI就只能凑合了，功能最重要。
 
-![截图](https://blog.lostshit.com/usr/uploads/2025/06/3569848927.jpg)
+![截图](https://blog.lostshit.com/usr/uploads/2025/06/3351330584.jpg)
 
 ## 已知问题
 1. 暂不支持tgs格式的sticker。
