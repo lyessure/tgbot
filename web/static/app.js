@@ -266,7 +266,19 @@ function updateChatList() {
     chats.forEach((chat) => {
         const chatDiv = document.createElement('div');
         chatDiv.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
-        chatDiv.textContent = chat.name;
+        // 新增头像
+        const avatar = document.createElement('img');
+        avatar.className = 'chat-avatar';
+        avatar.src = `/api/avatar/${chat.id}`;
+        avatar.onerror = function() {
+            this.src = '/static/default-avatar.png';
+        };
+        chatDiv.appendChild(avatar);
+        // 名字
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = chat.name;
+        nameSpan.style.marginLeft = '12px';
+        chatDiv.appendChild(nameSpan);
         chatDiv.onclick = () => selectChat(chat.id);
         chatList.appendChild(chatDiv);
     });

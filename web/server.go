@@ -4,6 +4,7 @@ import (
 	"bot/api"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -332,6 +333,29 @@ func StartWebServer(port string) {
 		}
 		log.Printf("Successfully got sticker file, size: %d", file.FileSize)
 		c.DataFromReader(http.StatusOK, file.FileSize, "image/webp", file.Reader, nil)
+	})
+
+	// 添加获取用户头像的路由
+	r.GET("/api/avatar/:userId", func(c *gin.Context) {
+		userIdStr := c.Param("userId")
+		var userId int64
+		_, err := fmt.Sscanf(userIdStr, "%d", &userId)
+		if err != nil {
+			c.String(http.StatusBadRequest, "Invalid userId")
+			return
+		}
+		fileId, err := api.GetUserAvatarFileID(userId)
+		if err != nil || fileId == "" {
+			// 返回默认头像
+			c.File("web/static/default-avatar.png")
+			return
+		}
+		file, err := api.GetFile(fileId)
+		if err != nil {
+			c.File("web/static/default-avatar.png")
+			return
+		}
+		c.DataFromReader(http.StatusOK, file.FileSize, "image/jpeg", file.Reader, nil)
 	})
 
 	globalServer = NewServer()

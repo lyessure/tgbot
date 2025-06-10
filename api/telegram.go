@@ -170,3 +170,18 @@ func GetFile(fileID string) (*FileData, error) {
 		FileSize: resp.ContentLength,
 	}, nil
 }
+
+// 获取用户头像FileID（最小尺寸）
+func GetUserAvatarFileID(userID int64) (string, error) {
+	photos, err := bot.GetUserProfilePhotos(tgbotapi.UserProfilePhotosConfig{
+		UserID: userID,
+		Limit:  1,
+	})
+	if err != nil {
+		return "", err
+	}
+	if photos.TotalCount == 0 || len(photos.Photos) == 0 || len(photos.Photos[0]) == 0 {
+		return "", fmt.Errorf("no avatar found")
+	}
+	return photos.Photos[0][0].FileID, nil
+}
