@@ -302,7 +302,7 @@ function selectChat(chatId) {
         // Always add user info header
         const userInfoHeader = document.createElement('div');
         userInfoHeader.className = 'user-info-header';
-        userInfoHeader.textContent = `对方用户名: @${chat.username || 'unknown'} 用户ID: ${chat.id}`;
+        userInfoHeader.textContent = `对方用户名: @${chat.username || '无'} ID: ${chat.id}`;
         messageList.appendChild(userInfoHeader);
         console.log('Added user info header:', userInfoHeader.textContent);  // Debug log
         

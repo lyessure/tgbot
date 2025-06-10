@@ -7,30 +7,35 @@
 
 ## 项目简介
 
-市面上很多私聊转发机器人（如 LivegramBot 等）都只能在 Telegram 里操作，回复转发消息不直观，所有会话混在一个单一窗口里，消息难找。
+市面上已经有很多私聊转发机器人（如 LivegramBot 等），但它们都只能在 Telegram 里进行操作。基于设计限制，它们均使用回复转发消息的方式操作很不直观，更头疼的是所有会话均混在单一的与机器的对话窗口里，消息难于找到及阅读。
 
 本机器人除了基础的手机 Telegram 消息转发，还提供了 **web 界面**，界面类似聊天应用，支持单独的会话窗口，使用更便捷。
 
 ### 主要优势
 
-- **Web 操作界面**，类似聊天 APP，消息分会话显示，方便查找和管理
-- 直接访问自己服务器，无需科学上网，不易被屏蔽
-- **所有数据仅保存在内存中**，docker 重启即清空，保护隐私
-- 极致隐私：将 `BOT_OWNER` 不设置或者设为0，消息仅保留在 web，不转发到手机
+- **Web 操作界面**，类似聊天 APP，消息分会话显示，方便查找和管理。
+- 直接访问自己服务器，无需科学上网，不易被屏蔽。
+- 极致隐私： **所有数据仅保存在内存中**，docker 重启即清空，保护隐私。不设置 `BOT_OWNER` 或者设为0，消息仅保留在 web，不转发到手机。web前后端分离，页面缓存不包含对话内容。
 
 ---
+## 运行截图
 
+我是后端技术，前端UI就只能凑合了，多多包涵。
+
+![截图](https://blog.lostshit.com/usr/uploads/2025/06/3351330584.jpg)
+
+
+---
 ## 快速开始
 
 1. 通过 [@BotFather](https://t.me/BotFather) 创建自己的机器人，获取 Bot Token
 2. 通过 [@userinfobot](https://t.me/userinfobot) 获取你的 Telegram ID  (可选)
-3. 修改示例的 `docker-compose.yml` 文件，替换 `BOT_TOKEN` 和 `BOT_OWNER`
+3. 修改示例的 `docker-compose.yml` 文件，替换 `BOT_TOKEN` 和 `BOT_OWNER`(可选)
 4. 启动容器：`docker compose up -d`
 5. 在 Telegram 里，给你的机器人发送 `/start`，开启双向通信。如果不需转发，可不做此步。
 6. 浏览器访问：http://你的服务器IP:8010 ，建议用 Cloudflare 或 Caddy 做 HTTPS 反向代理（回源用 HTTP）
 
 ---
-
 ## 示例 docker-compose.yml
 
 ```yaml
@@ -42,16 +47,11 @@ services:
     container_name: tg_fwd_web_bot
     environment:
       - BOT_TOKEN=在BotFather获得的token
-      - BOT_OWNER=在userinfobot获得的id，消息将转发到此号码。可注释掉本项，或者填0,即不转发。
+#      - BOT_OWNER=在userinfobot获得的id，消息将同时转发到此号码。可注释掉本项，或者填0,即不转发。
     ports:
       - "8010:8010"
 ```
 
-## 运行截图
-
-我是后端技术，前端UI就只能凑合了，功能最重要。
-
-![截图](https://blog.lostshit.com/usr/uploads/2025/06/3351330584.jpg)
 
 ## 已知问题
 1. 暂不支持tgs格式的sticker。
