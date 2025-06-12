@@ -182,6 +182,7 @@ function renderMessage(message) {
         img.dataset.largeId = message.photoLargeId; // 保存原图ID
         img.onload = function() {
             console.log('Image loaded successfully:', message.photoId);
+            messageList.scrollTop = messageList.scrollHeight;
         };
         img.onerror = function() {
             console.error('Failed to load image:', message.photoId);
@@ -191,6 +192,7 @@ function renderMessage(message) {
             errorDiv.className = 'image-error';
             errorDiv.textContent = '图片加载失败';
             contentDiv.appendChild(errorDiv);
+            messageList.scrollTop = messageList.scrollHeight;
         };
         contentDiv.appendChild(img);
     }
@@ -205,6 +207,9 @@ function renderMessage(message) {
             const img = document.createElement('img');
             img.className = 'message-sticker';
             img.src = cachedUrl;
+            img.onload = function() {
+                messageList.scrollTop = messageList.scrollHeight;
+            };
             img.onerror = function() {
                 // 如果img加载失败，尝试用<video>
                 const video = document.createElement('video');
@@ -214,8 +219,12 @@ function renderMessage(message) {
                 video.loop = true;
                 video.muted = true;
                 video.playsInline = true;
+                video.onloadeddata = function() {
+                    messageList.scrollTop = messageList.scrollHeight;
+                };
                 contentDiv.appendChild(video);
                 img.remove();
+                messageList.scrollTop = messageList.scrollHeight;
             };
             contentDiv.appendChild(img);
         } else {
@@ -225,6 +234,7 @@ function renderMessage(message) {
             img.src = stickerUrl;
             img.onload = function() {
                 stickerCache.set(message.stickerId, stickerUrl);
+                messageList.scrollTop = messageList.scrollHeight;
             };
             img.onerror = function() {
                 // 如果img加载失败，尝试用<video>
@@ -237,9 +247,11 @@ function renderMessage(message) {
                 video.playsInline = true;
                 video.onloadeddata = function() {
                     stickerCache.set(message.stickerId, stickerUrl);
+                    messageList.scrollTop = messageList.scrollHeight;
                 };
                 contentDiv.appendChild(video);
                 img.remove();
+                messageList.scrollTop = messageList.scrollHeight;
             };
             contentDiv.appendChild(img);
         }
@@ -251,6 +263,9 @@ function renderMessage(message) {
         video.className = 'message-video';
         video.controls = true;
         video.src = `/api/video/${message.videoId}`;
+        video.onloadeddata = function() {
+            messageList.scrollTop = messageList.scrollHeight;
+        };
         video.onerror = function() {
             console.error('Failed to load video:', message.videoId);
             this.style.display = 'none';
@@ -259,6 +274,7 @@ function renderMessage(message) {
             errorDiv.className = 'video-error';
             errorDiv.textContent = '视频加载失败';
             contentDiv.appendChild(errorDiv);
+            messageList.scrollTop = messageList.scrollHeight;
         };
         contentDiv.appendChild(video);
     }
@@ -316,8 +332,23 @@ function selectChat(chatId) {
         messageList.appendChild(userInfoHeader);
         console.log('Added user info header:', userInfoHeader.textContent);  // Debug log
         
+        // 只追踪photoId图片的加载
+        const imageLoadPromises = [];
+        
         chat.messages.forEach(msg => {
             renderMessage(msg);
+            // 只追踪photoId图片
+            if (msg.photoId) {
+                const images = messageList.getElementsByTagName('img');
+                const lastImage = images[images.length - 1];
+                if (lastImage) {
+                    const promise = new Promise((resolve) => {
+                        lastImage.onload = resolve;
+                        lastImage.onerror = resolve;
+                    });
+                    imageLoadPromises.push(promise);
+                }
+            }
         });
         
         // Update active state in chat list
@@ -328,8 +359,16 @@ function selectChat(chatId) {
             }
         });
         
-        // Scroll to bottom
+        // 等待所有图片加载完成后再滚动到底部
+        Promise.all(imageLoadPromises).then(() => {
+            messageList.scrollTop = messageList.scrollHeight;
+        });
+        // 立即滚动到底部一次（不等待图片）
         messageList.scrollTop = messageList.scrollHeight;
+        // 渲染后用setTimeout再滚动一次，确保异步渲染后能到最底部
+        setTimeout(() => {
+            messageList.scrollTop = messageList.scrollHeight;
+        }, 100);
     }
 }
 
