@@ -500,43 +500,51 @@ function enableImageZoom() {
         if (e.target && e.target.classList.contains('message-image')) {
             const previewImage = document.getElementById('previewImage');
             const largeImageId = e.target.dataset.largeId;
-            
             if (!largeImageId) {
                 console.error('No large image ID found');
                 return;
             }
-            
-            // 使用原图URL
             const largeImageUrl = `/api/photo/${largeImageId}`;
-            
-            // 创建一个新的Image对象来获取原始尺寸
+
+            // 先清空
+            previewImage.src = '';
+            previewImage.style.cssText = '';
+            previewImage.alt = '预览图片';
+            // 移除上次的错误提示
+            if (previewImage.parentNode.querySelector('.image-error')) {
+                previewImage.parentNode.querySelector('.image-error').remove();
+            }
+
+            // 错误提示
+            previewImage.onerror = function() {
+                previewImage.style.cssText = 'width: 240px; height: 120px; object-fit: contain; display: block; margin: 0 auto; color: #888;';
+                previewImage.alt = '图片加载失败';
+                previewImage.src = '';
+                // 显示错误提示
+                if (!previewImage.parentNode.querySelector('.image-error')) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'image-error';
+                    errorDiv.style = 'color:#888;font-size:18px;padding:40px 0;';
+                    errorDiv.textContent = '图片加载失败';
+                    previewImage.parentNode.appendChild(errorDiv);
+                }
+            };
+
+            // 用于获取原始尺寸
             const tempImg = new Image();
             tempImg.onload = function() {
-                // 获取原始尺寸和窗口尺寸
                 const naturalWidth = tempImg.naturalWidth;
                 const naturalHeight = tempImg.naturalHeight;
-                const windowWidth = window.innerWidth * 0.9;  // 90%的窗口宽度
-                const windowHeight = window.innerHeight * 0.8; // 80%的窗口高度
-                
-                console.log(`图片原始尺寸: ${naturalWidth} x ${naturalHeight}`);
-                console.log(`可用窗口尺寸: ${windowWidth} x ${windowHeight}`);
-                
-                // 计算缩放比例
+                const windowWidth = window.innerWidth * 0.9;
+                const windowHeight = window.innerHeight * 0.8;
                 let scale = 1;
                 if (naturalWidth > windowWidth || naturalHeight > windowHeight) {
-                    // 如果图片超出窗口，计算合适的缩放比例
                     const scaleX = windowWidth / naturalWidth;
                     const scaleY = windowHeight / naturalHeight;
                     scale = Math.min(scaleX, scaleY);
                 }
-                
-                // 计算缩放后的尺寸
                 const scaledWidth = naturalWidth * scale;
                 const scaledHeight = naturalHeight * scale;
-                
-                console.log(`缩放比例: ${scale}, 显示尺寸: ${scaledWidth} x ${scaledHeight}`);
-                
-                // 设置预览图片的样式
                 previewImage.style.cssText = `
                     width: ${scaledWidth}px !important;
                     height: ${scaledHeight}px !important;
@@ -547,27 +555,28 @@ function enableImageZoom() {
                     outline: none !important;
                     transition: width 0.3s, height 0.3s !important;
                 `;
-                
-                // 设置图片源为原图
-                previewImage.src = largeImageUrl;
             };
-            
-            // 加载原图
             tempImg.src = largeImageUrl;
-            
-            // 隐藏发送按钮（用于查看图片）
+
+            // 设置图片源为原图
+            previewImage.src = largeImageUrl;
+
+            // 隐藏发送按钮
             document.getElementById('confirmSend').style.display = 'none';
             previewModal.show();
-            
-            console.log('显示图片预览:', largeImageUrl);
         }
     });
-    
-    // 关闭模态框时重置样式
+
+    // 关闭模态框时重置
     document.getElementById('previewModal').addEventListener('hidden.bs.modal', function() {
         const previewImage = document.getElementById('previewImage');
         previewImage.style.cssText = '';
-        previewImage.src = '';  // 清除图片源
+        previewImage.src = '';
+        previewImage.alt = '预览图片';
+        // 移除错误提示
+        if (previewImage.parentNode.querySelector('.image-error')) {
+            previewImage.parentNode.querySelector('.image-error').remove();
+        }
         document.getElementById('confirmSend').style.display = '';
     });
 } 
