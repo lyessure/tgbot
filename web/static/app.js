@@ -1,3 +1,91 @@
+// 多语言支持
+const translations = {
+    'zh-CN': {
+        'chatList': '聊天列表',
+        'inputMessage': '输入消息...',
+        'imagePreview': '图片预览',
+        'sendImage': '发送图片',
+        'close': '关闭',
+        'me': '我',
+        'otherUser': '对方用户名: @',
+        'noUsername': '无',
+        'imageLoadError': '图片加载失败',
+        'videoLoadError': '视频加载失败'
+    },
+    'zh-TW': {
+        'chatList': '聊天列表',
+        'inputMessage': '輸入訊息...',
+        'imagePreview': '圖片預覽',
+        'sendImage': '發送圖片',
+        'close': '關閉',
+        'me': '我',
+        'otherUser': '對方用戶名: @',
+        'noUsername': '無',
+        'imageLoadError': '圖片載入失敗',
+        'videoLoadError': '影片載入失敗'
+    },
+    'en': {
+        'chatList': 'Chat List',
+        'inputMessage': 'Type a message...',
+        'imagePreview': 'Image Preview',
+        'sendImage': 'Send Image',
+        'close': 'Close',
+        'me': 'Me',
+        'otherUser': 'Other User: @',
+        'noUsername': 'None',
+        'imageLoadError': 'Image load failed',
+        'videoLoadError': 'Video load failed'
+    }
+};
+
+// 检测浏览器语言
+function detectLanguage() {
+    const browserLang = navigator.language || navigator.userLanguage;
+    if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh')) {
+        return 'zh-CN';
+    } else if (browserLang.startsWith('zh-TW')) {
+        return 'zh-TW';
+    } else {
+        return 'en';
+    }
+}
+
+// 获取翻译文本
+function t(key) {
+    const lang = detectLanguage();
+    const langTranslations = translations[lang] || translations['en'];
+    return langTranslations[key] || key;
+}
+
+// 初始化页面翻译
+function initializeTranslations() {
+    // 翻译HTML中的静态文本
+    const chatListHeader = document.querySelector('.chat-list-header h4');
+    if (chatListHeader) {
+        chatListHeader.textContent = `💬 ${t('chatList')}`;
+    }
+    
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.placeholder = t('inputMessage');
+    }
+    
+    const modalTitle = document.querySelector('#previewModal .modal-title');
+    if (modalTitle) {
+        modalTitle.innerHTML = `<i class="bi bi-image me-2"></i>${t('imagePreview')}`;
+    }
+    
+    const confirmSendBtn = document.getElementById('confirmSend');
+    if (confirmSendBtn) {
+        confirmSendBtn.innerHTML = `<i class="bi bi-send me-2"></i>${t('sendImage')}`;
+    }
+    
+    const closeBtn = document.querySelector('#previewModal .btn-close');
+    if (closeBtn) {
+        closeBtn.setAttribute('aria-label', t('close'));
+    }
+}
+
 let ws;
 let currentChatId = null;
 let chats = new Map();
@@ -162,10 +250,13 @@ function renderMessage(message) {
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
+        second: '2-digit', 
         hour12: false
     }).replace(/\//g, '-'));
-    infoDiv.textContent = `${message.name} · ${timestamp}`;
+    
+    // 显示名称时，如果是"我"则显示翻译后的文本，否则显示原名称
+    const displayName = message.name === '我' ? t('me') : message.name;
+    infoDiv.textContent = `${displayName} · ${timestamp}`;
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -190,7 +281,7 @@ function renderMessage(message) {
             // 添加错误提示
             const errorDiv = document.createElement('div');
             errorDiv.className = 'image-error';
-            errorDiv.textContent = '图片加载失败';
+            errorDiv.textContent = t('imageLoadError');
             contentDiv.appendChild(errorDiv);
             messageList.scrollTop = messageList.scrollHeight;
         };
@@ -272,7 +363,7 @@ function renderMessage(message) {
             // 添加错误提示
             const errorDiv = document.createElement('div');
             errorDiv.className = 'video-error';
-            errorDiv.textContent = '视频加载失败';
+            errorDiv.textContent = t('videoLoadError');
             contentDiv.appendChild(errorDiv);
             messageList.scrollTop = messageList.scrollHeight;
         };
@@ -328,7 +419,7 @@ function selectChat(chatId) {
         // Always add user info header
         const userInfoHeader = document.createElement('div');
         userInfoHeader.className = 'user-info-header';
-        userInfoHeader.textContent = `对方用户名: @${chat.username || '无'} ID: ${chat.id}`;
+        userInfoHeader.textContent = `${t('otherUser')}${chat.username || t('noUsername')} ID: ${chat.id}`;
         messageList.appendChild(userInfoHeader);
         console.log('Added user info header:', userInfoHeader.textContent);  // Debug log
         
@@ -451,6 +542,9 @@ document.getElementById('fileInput').onchange = handleFileUpload;
 
 // 初始化预览模态框
 document.addEventListener('DOMContentLoaded', () => {
+    // 初始化多语言支持
+    initializeTranslations();
+    
     previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
     
     // 确认发送按钮事件
@@ -509,7 +603,7 @@ function enableImageZoom() {
             // 先清空
             previewImage.src = '';
             previewImage.style.cssText = '';
-            previewImage.alt = '预览图片';
+            previewImage.alt = t('imagePreview');
             // 移除上次的错误提示
             if (previewImage.parentNode.querySelector('.image-error')) {
                 previewImage.parentNode.querySelector('.image-error').remove();
@@ -518,14 +612,14 @@ function enableImageZoom() {
             // 错误提示
             previewImage.onerror = function() {
                 previewImage.style.cssText = 'width: 240px; height: 120px; object-fit: contain; display: block; margin: 0 auto; color: #888;';
-                previewImage.alt = '图片加载失败';
+                previewImage.alt = t('imageLoadError');
                 previewImage.src = '';
                 // 显示错误提示
                 if (!previewImage.parentNode.querySelector('.image-error')) {
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'image-error';
                     errorDiv.style = 'color:#888;font-size:18px;padding:40px 0;';
-                    errorDiv.textContent = '图片加载失败';
+                    errorDiv.textContent = t('imageLoadError');
                     previewImage.parentNode.appendChild(errorDiv);
                 }
             };
@@ -572,7 +666,7 @@ function enableImageZoom() {
         const previewImage = document.getElementById('previewImage');
         previewImage.style.cssText = '';
         previewImage.src = '';
-        previewImage.alt = '预览图片';
+        previewImage.alt = t('imagePreview');
         // 移除错误提示
         if (previewImage.parentNode.querySelector('.image-error')) {
             previewImage.parentNode.querySelector('.image-error').remove();
